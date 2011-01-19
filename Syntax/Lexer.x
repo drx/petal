@@ -19,10 +19,12 @@ tokens :-
 	jump				{ \p s -> tokenWithPos p TkJump }
     	"+"				{ \p s -> tokenWithPos p TkPlus }
 	"="				{ \p s -> tokenWithPos p TkAssign }
+	":"				{ \p s -> tokenWithPos p TkColon }
 	$alpha ($digit | $alpha)* 	{ \p s -> tokenWithPos p (TkName s) }
 {                                                 
 data BaseToken = 
 	 TkAssign
+	| TkColon
 	| TkDelimiter
 	| TkIf
 	| TkInt Int
