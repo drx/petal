@@ -50,7 +50,8 @@ action_0,
  action_19,
  action_20,
  action_21,
- action_22 :: () => Int -> ({-HappyReduction (HappyIdentity) = -}
+ action_22,
+ action_23 :: () => Int -> ({-HappyReduction (HappyIdentity) = -}
 	   Int 
 	-> (Token)
 	-> HappyState (Token) (HappyStk HappyAbsSyn -> [(Token)] -> (HappyIdentity) HappyAbsSyn)
@@ -67,7 +68,8 @@ happyReduce_1,
  happyReduce_7,
  happyReduce_8,
  happyReduce_9,
- happyReduce_10 :: () => ({-HappyReduction (HappyIdentity) = -}
+ happyReduce_10,
+ happyReduce_11 :: () => ({-HappyReduction (HappyIdentity) = -}
 	   Int 
 	-> (Token)
 	-> HappyState (Token) (HappyStk HappyAbsSyn -> [(Token)] -> (HappyIdentity) HappyAbsSyn)
@@ -91,12 +93,7 @@ action_2 _ = happyReduce_1
 action_3 (9) = happyShift action_15
 action_3 _ = happyFail
 
-action_4 (10) = happyShift action_6
-action_4 (12) = happyShift action_7
-action_4 (14) = happyShift action_8
-action_4 (5) = happyGoto action_3
-action_4 (6) = happyGoto action_4
-action_4 (7) = happyGoto action_14
+action_4 (9) = happyShift action_14
 action_4 _ = happyReduce_9
 
 action_5 (16) = happyAccept
@@ -116,8 +113,8 @@ action_8 _ = happyFail
 
 action_9 (11) = happyShift action_2
 action_9 (13) = happyShift action_11
-action_9 (14) = happyShift action_19
-action_9 (4) = happyGoto action_18
+action_9 (14) = happyShift action_20
+action_9 (4) = happyGoto action_19
 action_9 _ = happyFail
 
 action_10 _ = happyReduce_7
@@ -126,9 +123,15 @@ action_11 _ = happyReduce_2
 
 action_12 _ = happyReduce_3
 
-action_13 (12) = happyShift action_17
+action_13 (12) = happyShift action_18
 action_13 _ = happyFail
 
+action_14 (10) = happyShift action_6
+action_14 (12) = happyShift action_7
+action_14 (14) = happyShift action_8
+action_14 (5) = happyGoto action_3
+action_14 (6) = happyGoto action_4
+action_14 (7) = happyGoto action_17
 action_14 _ = happyReduce_10
 
 action_15 (10) = happyShift action_6
@@ -140,26 +143,28 @@ action_15 _ = happyFail
 
 action_16 _ = happyReduce_8
 
-action_17 (11) = happyShift action_2
-action_17 (13) = happyShift action_11
-action_17 (14) = happyShift action_12
-action_17 (4) = happyGoto action_21
-action_17 _ = happyFail
+action_17 _ = happyReduce_11
 
-action_18 _ = happyReduce_4
+action_18 (11) = happyShift action_2
+action_18 (13) = happyShift action_11
+action_18 (14) = happyShift action_12
+action_18 (4) = happyGoto action_22
+action_18 _ = happyFail
 
-action_19 (15) = happyShift action_20
-action_19 _ = happyReduce_3
+action_19 _ = happyReduce_4
 
-action_20 (11) = happyShift action_2
-action_20 (13) = happyShift action_11
-action_20 (14) = happyShift action_12
-action_20 (4) = happyGoto action_22
-action_20 _ = happyFail
+action_20 (15) = happyShift action_21
+action_20 _ = happyReduce_3
 
-action_21 _ = happyReduce_6
+action_21 (11) = happyShift action_2
+action_21 (13) = happyShift action_11
+action_21 (14) = happyShift action_12
+action_21 (4) = happyGoto action_23
+action_21 _ = happyFail
 
-action_22 _ = happyReduce_5
+action_22 _ = happyReduce_6
+
+action_23 _ = happyReduce_5
 
 happyReduce_1 = happySpecReduce_1  4 happyReduction_1
 happyReduction_1 (HappyTerminal ((_,TkInt happy_var_1)))
@@ -237,12 +242,21 @@ happyReduction_9 (HappyAbsSyn6  happy_var_1)
 happyReduction_9 _  = notHappyAtAll 
 
 happyReduce_10 = happySpecReduce_2  7 happyReduction_10
-happyReduction_10 (HappyAbsSyn7  happy_var_2)
+happyReduction_10 _
 	(HappyAbsSyn6  happy_var_1)
 	 =  HappyAbsSyn7
-		 (happy_var_1:happy_var_2
+		 ([happy_var_1]
 	)
 happyReduction_10 _ _  = notHappyAtAll 
+
+happyReduce_11 = happySpecReduce_3  7 happyReduction_11
+happyReduction_11 (HappyAbsSyn7  happy_var_3)
+	_
+	(HappyAbsSyn6  happy_var_1)
+	 =  HappyAbsSyn7
+		 (happy_var_1:happy_var_3
+	)
+happyReduction_11 _ _ _  = notHappyAtAll 
 
 happyNewToken action sts stk [] =
 	action 16 16 notHappyAtAll (HappyState action) sts stk []

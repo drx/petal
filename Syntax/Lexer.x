@@ -12,7 +12,7 @@ $alpha = [a-zA-Z]
 tokens :- 
 	\;.*				;
 	[\ \t\f\v\r]+			;
-	\n				{ \p s -> tokenWithPos p TkDelimiter }
+	\n+				{ \p s -> tokenWithPos p TkDelimiter }
 	r$digit+			{ \p s -> tokenWithPos p (TkRegister (read (tail s))) }
     	$digit+				{ \p s -> tokenWithPos p (TkInt (read s)) }
 	if				{ \p s -> tokenWithPos p TkIf }

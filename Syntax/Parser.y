@@ -41,8 +41,9 @@ instructionSeq: Jump value			{ [Jump $2] }
 	        | instruction Delimiter instructionSeq { $1:$3 }
 
 program	:: { Program }	
-program:	instructionSeq			{ [$1]  }
-       		| instructionSeq program 	{ $1:$2 }
+program:	instructionSeq 			{ [$1]  }
+       		| instructionSeq Delimiter	{ [$1]  }
+       		| instructionSeq Delimiter program { $1:$3 }
 		
 {
 
