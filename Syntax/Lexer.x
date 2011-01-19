@@ -1,5 +1,7 @@
 {
+
 module Syntax.Lexer where
+
 }
 
 %wrapper "posn"

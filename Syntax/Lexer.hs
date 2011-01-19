@@ -1,7 +1,9 @@
 {-# OPTIONS -cpp #-}
 {-# LINE 1 "Lexer.x" #-}
 
+
 module Syntax.Lexer where
+
 
 #if __GLASGOW_HASKELL__ >= 603
 #include "ghcconfig.h"
@@ -138,7 +140,7 @@ alex_deflt :: Array Int Int
 alex_deflt = listArray (0,18) [-1,-1,3,3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 
 alex_accept = listArray (0::Int,18) [[],[],[(AlexAccSkip)],[(AlexAccSkip)],[(AlexAccSkip)],[(AlexAcc (alex_action_2))],[(AlexAcc (alex_action_3))],[(AlexAcc (alex_action_9))],[(AlexAcc (alex_action_4))],[(AlexAcc (alex_action_5))],[(AlexAcc (alex_action_9))],[(AlexAcc (alex_action_6))],[(AlexAcc (alex_action_9))],[(AlexAcc (alex_action_9))],[(AlexAcc (alex_action_9))],[(AlexAcc (alex_action_7))],[(AlexAcc (alex_action_8))],[(AlexAcc (alex_action_9))],[(AlexAcc (alex_action_9))]]
-{-# LINE 21 "Lexer.x" #-}
+{-# LINE 23 "Lexer.x" #-}
                                                  
 data BaseToken = 
 	 TkAssign
