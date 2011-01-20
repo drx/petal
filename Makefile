@@ -9,3 +9,6 @@ parser: Syntax/Parser.hs
 
 Syntax/Parser.hs: Syntax/Parser.y
 	happy -iSyntax/grammar Syntax/Parser.y
+
+wc:	
+	wc -l *.hs Syntax/Term.hs Syntax/Parser.y Syntax/Lexer.x
