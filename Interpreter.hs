@@ -52,7 +52,7 @@ step (heap, rf, (IfJump r1 v):is) = case getValue $ r rf r1 of
 
 step (heap, rf, (Label l):is) = (heap, rf, is)
 
-step (heap, rf, is) = error $ "Stuck term: " ++ (show heap) ++ " " ++ (show rf) ++ " " ++ (show is)
+step (heap, rf, is) = error $ "Stuck term:\nheap: " ++ (show heap) ++ "\nregisterfile: " ++ (show rf) ++ "\ninstructions: " ++ (show is)
 
 
 
