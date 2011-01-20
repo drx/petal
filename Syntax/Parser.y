@@ -40,13 +40,11 @@ instruction:	Register Assign value		{ Assign $1 $3 }
 
 instruction1 :: { [Instruction] }
 instruction1:	instruction			{ [$1] }
-		| instructionLabel		{ $1 }
-
-instructionLabel :: { [Instruction] }
-instructionLabel: Name Colon instruction	{ [Label $1, $3] }
+		| Name Colon instruction	{ [Label $1, $3] }
 
 instructionSeq :: { [Instruction] }
 instructionSeq: Jump value			{ [Jump $2] }
+	      	| Name Colon Jump value		{ [Label $1, Jump $4] }
 	        | instruction1 Delimiter instructionSeq { $1++$3 }
 
 program	:: { Program }	

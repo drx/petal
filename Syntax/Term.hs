@@ -1,8 +1,8 @@
 module Syntax.Term where
 
-data Value = 	Int Int 
-		| VLabel String
-		| Register Int
+data Value = 	Int { getValue :: Int }
+		| VLabel { getLabel :: String }
+		| Register { getNumber :: Int }
 		deriving (Show, Eq)
 
 data Instruction = 	Assign Int Value
@@ -12,4 +12,5 @@ data Instruction = 	Assign Int Value
 			| Label String
 			deriving (Show, Eq)
 
+type InstructionSequence = [Instruction]
 type Program = [[Instruction]]
