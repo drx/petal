@@ -8,14 +8,19 @@ type RegisterFile = [(Int, Value)]
 type State = (Heap, RegisterFile, InstructionSequence)
 
 statify :: Program -> State
-statify (i:is) = (statify1 (i:is), [], i) where
+statify (i:is) = (statify1 (i:is), [],delabelize i) where
 			statify1 :: Program -> Heap
 			statify1 [] = []
 			statify1 (i:is) = (heapify i) ++ (statify1 is) where
 				heapify :: InstructionSequence -> Heap
-				heapify ((Label l):is) = (l,is):(heapify is)
+				heapify ((Label l):is) = (l,delabelize is):(heapify is)
 				heapify (_:is) = (heapify is)
 				heapify [] = []
+
+delabelize :: InstructionSequence -> InstructionSequence
+delabelize (Label _:is) = delabelize is
+delabelize (i:is) = i:(delabelize is)
+delabelize [] = []
 
 interpret :: State -> IO ()
 interpret s@(heap, rf, is) 	| is == [] = putStrLn $ (show rf) ++ " " ++ (show heap)
@@ -50,7 +55,7 @@ step (heap, rf, (IfJump r1 v):is) = case getValue $ r rf r1 of
 					0 -> (heap, rf, h rf heap (rhat rf v))
 					n -> (heap, rf, is)
 
-step (heap, rf, (Label l):is) = (heap, rf, is)
+--step (heap, rf, (Label l):is) = (heap, rf, is)
 
 step (heap, rf, is) = error $ "Stuck term:\nheap: " ++ (show heap) ++ "\nregisterfile: " ++ (show rf) ++ "\ninstructions: " ++ (show is)
 
