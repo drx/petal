@@ -2,11 +2,6 @@ module Interpreter where
 
 import Syntax.Term
 
-type Heap = [(String, InstructionSequence)]
-type RegisterFile = [(Int, Value)]
-
-type State = (Heap, RegisterFile, InstructionSequence)
-
 statify :: Program -> State
 statify (i:is) = (statify1 (i:is), [],delabelize i) where
 			statify1 :: Program -> Heap

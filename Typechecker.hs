@@ -3,9 +3,6 @@ module Typechecker where
 import Syntax.Term
 import Data.List
 
-type Gamma = [(Int, Type)]
-type Psi = [(String, Type)]
-data Type = TInt |TCode Gamma | TVar String | TForall String Type deriving (Show, Eq)
 
 psi :: Psi -> String -> Type
 psi p s = case lookup s p of
@@ -38,13 +35,13 @@ tci p g (IfJump r v) = if tcv p g (Register r) == TInt
 					else terror $ (show v) ++ " not the type of code("++(show g)++")"
 				else terror $ "r" ++ (show r) ++ " not Int"
 
+tcr :: Psi -> RegisterFile -> [Int] -> Gamma
+--tcr p rf rs = 
 
-
-ftv :: Type -> [String]
-ftv (TInt) = []
-ftv (TCode g) = concat (map (ftv.snd) g)
-ftv (TVar s) = [s]
-ftv (TForall s t) = (ftv t) \\ [s]
+tc (h, rf, i) = let 	p = tch h
+			rs = registersh h
+			g = tcr p rf rs in
+				(p, g, tcis p i)
 
 terror :: String -> a
 terror s = error $ "type error: " ++ s
