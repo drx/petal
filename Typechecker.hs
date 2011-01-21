@@ -19,7 +19,7 @@ gammasubst g r t = (r,t):(filter (\x -> fst x /= r) g)
 
 tcv :: Psi -> Gamma -> Value -> Type
 tcv p g (Int n) = TInt
-tcv p g (VLabel l) = psi p l
+tcv p g (Label l) = psi p l
 tcv p g (Register n) = gamma g n
 
 tci :: Psi -> Gamma -> Instruction -> (Gamma, Gamma)

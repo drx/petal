@@ -3,6 +3,7 @@ module Syntax.Parser where
 
 import Syntax.Lexer
 import Syntax.Term
+import Data.List
 }
 
 %name parse program1
@@ -28,33 +29,31 @@ import Syntax.Term
 %%                              
 
 value :: { Value }
-value:		Int				{ Int $1 }
-     		| Name				{ VLabel $1 }
-		| Register			{ Register $1 }
+value:		Int							{ Int $1 }
+     		| Name							{ Label $1 }
+		| Register						{ Register $1 }
 
 instruction :: { Instruction }
-instruction:	Register Assign value		{ Assign $1 $3 }
-	   	| Register Assign Register Plus value { AssignPlus $1 $3 $5 }
-		| If Register Jump value	{ IfJump $2 $4 }
-		| Name Colon			{ Label $1 }
+instruction:	Register Assign value					{ Assign $1 $3 }
+	   	| Register Assign Register Plus value 			{ AssignPlus $1 $3 $5 }
+		| If Register Jump value				{ IfJump $2 $4 }
 
-instruction1 :: { [Instruction] }
-instruction1:	instruction			{ [$1] }
-		| Name Colon instruction	{ [Label $1, $3] }
+instructionSeq :: { InstructionSequence }
+instructionSeq: Name Colon instructions Jump value			{ Seq $1 $3 $5 (nub $ (registers $3)++(registersv $5))}
+	      	| Name Colon Delimiter instructions Jump value		{ Seq $1 $4 $6 (nub $ (registersv $6)++(registers $4)) }
 
-instructionSeq :: { [Instruction] }
-instructionSeq: Jump value			{ [Jump $2] }
-	      	| Name Colon Jump value		{ [Label $1, Jump $4] }
-	        | instruction1 Delimiter instructionSeq { $1++$3 }
+instructions :: { [Instruction] }
+instructions:	instruction Delimiter instructions 			{ $1:$3 }
+	    	| 							{ []	}
 
 program	:: { Program }	
-program:	instructionSeq 			{ [$1]  }
-       		| instructionSeq Delimiter	{ [$1]  }
-       		| instructionSeq Delimiter program { $1:$3 }
+program:	instructionSeq 						{ [$1]  }
+       		| instructionSeq Delimiter				{ [$1]  } 	
+       		| instructionSeq Delimiter program 			{ $1:$3 }
 
 program1 :: { Program }
-program1:	program				{ $1 }
-		| Delimiter program		{ $2 }
+program1:	program							{ $1 }
+		| Delimiter program					{ $2 }
 
 {
 

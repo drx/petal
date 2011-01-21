@@ -13,17 +13,15 @@ Grammar
 	instruction -> Register Assign value               (4)
 	instruction -> Register Assign Register Plus value   (5)
 	instruction -> If Register Jump value              (6)
-	instruction -> Name Colon                          (7)
-	instruction1 -> instruction                        (8)
-	instruction1 -> Name Colon instruction             (9)
-	instructionSeq -> Jump value                       (10)
-	instructionSeq -> Name Colon Jump value            (11)
-	instructionSeq -> instruction1 Delimiter instructionSeq   (12)
-	program -> instructionSeq                          (13)
-	program -> instructionSeq Delimiter                (14)
-	program -> instructionSeq Delimiter program        (15)
-	program1 -> program                                (16)
-	program1 -> Delimiter program                      (17)
+	instructionSeq -> Name Colon instructions Jump value   (7)
+	instructionSeq -> Name Colon Delimiter instructions Jump value   (8)
+	instructions -> instruction Delimiter instructions   (9)
+	instructions ->                                    (10)
+	program -> instructionSeq                          (11)
+	program -> instructionSeq Delimiter                (12)
+	program -> instructionSeq Delimiter program        (13)
+	program1 -> program                                (14)
+	program1 -> Delimiter program                      (15)
 
 -----------------------------------------------------------------------------
 Terminals
@@ -43,11 +41,11 @@ Non-terminals
 -----------------------------------------------------------------------------
 	%start_parse    rule  0
 	value           rules 1, 2, 3
-	instruction     rules 4, 5, 6, 7
-	instruction1    rules 8, 9
-	instructionSeq  rules 10, 11, 12
-	program         rules 13, 14, 15
-	program1        rules 16, 17
+	instruction     rules 4, 5, 6
+	instructionSeq  rules 7, 8
+	instructions    rules 9, 10
+	program         rules 11, 12, 13
+	program1        rules 14, 15
 
 -----------------------------------------------------------------------------
 States
@@ -55,17 +53,12 @@ States
 State 0
 
 
-	Delimiter      shift, and enter state 8
-	If             shift, and enter state 9
-	Jump           shift, and enter state 10
-	Name           shift, and enter state 11
-	Register       shift, and enter state 12
+	Delimiter      shift, and enter state 6
+	Name           shift, and enter state 7
 
-	instruction    goto state 3
-	instruction1   goto state 4
-	instructionSeq goto state 5
-	program        goto state 6
-	program1       goto state 7
+	instructionSeq goto state 3
+	program        goto state 4
+	program1       goto state 5
 
 State 1
 
@@ -83,124 +76,185 @@ State 2
 
 State 3
 
-	instruction1 -> instruction .                       (rule 8)
+	program -> instructionSeq .                         (rule 11)
+	program -> instructionSeq . Delimiter               (rule 12)
+	program -> instructionSeq . Delimiter program       (rule 13)
 
-	Delimiter      reduce using rule 8
+	Delimiter      shift, and enter state 10
+	%eof           reduce using rule 11
 
 
 State 4
 
-	instructionSeq -> instruction1 . Delimiter instructionSeq    (rule 12)
+	program1 -> program .                               (rule 14)
 
-	Delimiter      shift, and enter state 21
+	%eof           reduce using rule 14
 
 
 State 5
-
-	program -> instructionSeq .                         (rule 13)
-	program -> instructionSeq . Delimiter               (rule 14)
-	program -> instructionSeq . Delimiter program       (rule 15)
-
-	Delimiter      shift, and enter state 20
-	%eof           reduce using rule 13
-
-
-State 6
-
-	program1 -> program .                               (rule 16)
-
-	%eof           reduce using rule 16
-
-
-State 7
 
 	%start_parse -> program1 .                          (rule 0)
 
 	%eof           accept
 
 
+State 6
+
+	program1 -> Delimiter . program                     (rule 15)
+
+	Name           shift, and enter state 7
+
+	instructionSeq goto state 3
+	program        goto state 9
+
+State 7
+
+	instructionSeq -> Name . Colon instructions Jump value    (rule 7)
+	instructionSeq -> Name . Colon Delimiter instructions Jump value    (rule 8)
+
+	Colon          shift, and enter state 8
+
+
 State 8
 
-	program1 -> Delimiter . program                     (rule 17)
+	instructionSeq -> Name Colon . instructions Jump value    (rule 7)
+	instructionSeq -> Name Colon . Delimiter instructions Jump value    (rule 8)
 
-	If             shift, and enter state 9
-	Jump           shift, and enter state 10
-	Name           shift, and enter state 11
-	Register       shift, and enter state 12
+	Delimiter      shift, and enter state 14
+	If             shift, and enter state 15
+	Jump           reduce using rule 10
+	Register       shift, and enter state 16
 
-	instruction    goto state 3
-	instruction1   goto state 4
-	instructionSeq goto state 5
-	program        goto state 19
+	instruction    goto state 12
+	instructions   goto state 13
 
 State 9
+
+	program1 -> Delimiter program .                     (rule 15)
+
+	%eof           reduce using rule 15
+
+
+State 10
+
+	program -> instructionSeq Delimiter .               (rule 12)
+	program -> instructionSeq Delimiter . program       (rule 13)
+
+	Name           shift, and enter state 7
+	%eof           reduce using rule 12
+
+	instructionSeq goto state 3
+	program        goto state 11
+
+State 11
+
+	program -> instructionSeq Delimiter program .       (rule 13)
+
+	%eof           reduce using rule 13
+
+
+State 12
+
+	instructions -> instruction . Delimiter instructions    (rule 9)
+
+	Delimiter      shift, and enter state 21
+
+
+State 13
+
+	instructionSeq -> Name Colon instructions . Jump value    (rule 7)
+
+	Jump           shift, and enter state 20
+
+
+State 14
+
+	instructionSeq -> Name Colon Delimiter . instructions Jump value    (rule 8)
+
+	If             shift, and enter state 15
+	Jump           reduce using rule 10
+	Register       shift, and enter state 16
+
+	instruction    goto state 12
+	instructions   goto state 19
+
+State 15
 
 	instruction -> If . Register Jump value             (rule 6)
 
 	Register       shift, and enter state 18
 
 
-State 10
-
-	instructionSeq -> Jump . value                      (rule 10)
-
-	Int            shift, and enter state 2
-	Name           shift, and enter state 16
-	Register       shift, and enter state 17
-
-	value          goto state 15
-
-State 11
-
-	instruction -> Name . Colon                         (rule 7)
-	instruction1 -> Name . Colon instruction            (rule 9)
-	instructionSeq -> Name . Colon Jump value           (rule 11)
-
-	Colon          shift, and enter state 14
-
-
-State 12
+State 16
 
 	instruction -> Register . Assign value              (rule 4)
 	instruction -> Register . Assign Register Plus value    (rule 5)
 
-	Assign         shift, and enter state 13
+	Assign         shift, and enter state 17
 
 
-State 13
+State 17
 
 	instruction -> Register Assign . value              (rule 4)
 	instruction -> Register Assign . Register Plus value    (rule 5)
 
 	Int            shift, and enter state 2
-	Name           shift, and enter state 16
+	Name           shift, and enter state 24
 	Register       shift, and enter state 29
 
 	value          goto state 28
 
-State 14
+State 18
 
-	instruction -> Name Colon .                         (rule 7)
-	instruction1 -> Name Colon . instruction            (rule 9)
-	instructionSeq -> Name Colon . Jump value           (rule 11)
+	instruction -> If Register . Jump value             (rule 6)
+
+	Jump           shift, and enter state 27
+
+
+State 19
+
+	instructionSeq -> Name Colon Delimiter instructions . Jump value    (rule 8)
+
+	Jump           shift, and enter state 26
+
+
+State 20
+
+	instructionSeq -> Name Colon instructions Jump . value    (rule 7)
+
+	Int            shift, and enter state 2
+	Name           shift, and enter state 24
+	Register       shift, and enter state 25
+
+	value          goto state 23
+
+State 21
+
+	instructions -> instruction Delimiter . instructions    (rule 9)
+
+	If             shift, and enter state 15
+	Jump           reduce using rule 10
+	Register       shift, and enter state 16
+
+	instruction    goto state 12
+	instructions   goto state 22
+
+State 22
+
+	instructions -> instruction Delimiter instructions .    (rule 9)
+
+	Jump           reduce using rule 9
+
+
+State 23
+
+	instructionSeq -> Name Colon instructions Jump value .    (rule 7)
 
 	Delimiter      reduce using rule 7
-	If             shift, and enter state 9
-	Jump           shift, and enter state 26
-	Name           shift, and enter state 27
-	Register       shift, and enter state 12
-
-	instruction    goto state 25
-
-State 15
-
-	instructionSeq -> Jump value .                      (rule 10)
-
-	Delimiter      reduce using rule 10
-	%eof           reduce using rule 10
+	%eof           reduce using rule 7
 
 
-State 16
+State 24
 
 	value -> Name .                                     (rule 2)
 
@@ -208,7 +262,7 @@ State 16
 	%eof           reduce using rule 2
 
 
-State 17
+State 25
 
 	value -> Register .                                 (rule 3)
 
@@ -216,97 +270,25 @@ State 17
 	%eof           reduce using rule 3
 
 
-State 18
-
-	instruction -> If Register . Jump value             (rule 6)
-
-	Jump           shift, and enter state 24
-
-
-State 19
-
-	program1 -> Delimiter program .                     (rule 17)
-
-	%eof           reduce using rule 17
-
-
-State 20
-
-	program -> instructionSeq Delimiter .               (rule 14)
-	program -> instructionSeq Delimiter . program       (rule 15)
-
-	If             shift, and enter state 9
-	Jump           shift, and enter state 10
-	Name           shift, and enter state 11
-	Register       shift, and enter state 12
-	%eof           reduce using rule 14
-
-	instruction    goto state 3
-	instruction1   goto state 4
-	instructionSeq goto state 5
-	program        goto state 23
-
-State 21
-
-	instructionSeq -> instruction1 Delimiter . instructionSeq    (rule 12)
-
-	If             shift, and enter state 9
-	Jump           shift, and enter state 10
-	Name           shift, and enter state 11
-	Register       shift, and enter state 12
-
-	instruction    goto state 3
-	instruction1   goto state 4
-	instructionSeq goto state 22
-
-State 22
-
-	instructionSeq -> instruction1 Delimiter instructionSeq .    (rule 12)
-
-	Delimiter      reduce using rule 12
-	%eof           reduce using rule 12
-
-
-State 23
-
-	program -> instructionSeq Delimiter program .       (rule 15)
-
-	%eof           reduce using rule 15
-
-
-State 24
-
-	instruction -> If Register Jump . value             (rule 6)
-
-	Int            shift, and enter state 2
-	Name           shift, and enter state 16
-	Register       shift, and enter state 17
-
-	value          goto state 33
-
-State 25
-
-	instruction1 -> Name Colon instruction .            (rule 9)
-
-	Delimiter      reduce using rule 9
-
-
 State 26
 
-	instructionSeq -> Name Colon Jump . value           (rule 11)
+	instructionSeq -> Name Colon Delimiter instructions Jump . value    (rule 8)
 
 	Int            shift, and enter state 2
-	Name           shift, and enter state 16
-	Register       shift, and enter state 17
+	Name           shift, and enter state 24
+	Register       shift, and enter state 25
 
 	value          goto state 32
 
 State 27
 
-	instruction -> Name . Colon                         (rule 7)
+	instruction -> If Register Jump . value             (rule 6)
 
-	Colon          shift, and enter state 31
+	Int            shift, and enter state 2
+	Name           shift, and enter state 24
+	Register       shift, and enter state 25
 
+	value          goto state 31
 
 State 28
 
@@ -329,34 +311,27 @@ State 30
 	instruction -> Register Assign Register Plus . value    (rule 5)
 
 	Int            shift, and enter state 2
-	Name           shift, and enter state 16
-	Register       shift, and enter state 17
+	Name           shift, and enter state 24
+	Register       shift, and enter state 25
 
-	value          goto state 34
+	value          goto state 33
 
 State 31
-
-	instruction -> Name Colon .                         (rule 7)
-
-	Delimiter      reduce using rule 7
-
-
-State 32
-
-	instructionSeq -> Name Colon Jump value .           (rule 11)
-
-	Delimiter      reduce using rule 11
-	%eof           reduce using rule 11
-
-
-State 33
 
 	instruction -> If Register Jump value .             (rule 6)
 
 	Delimiter      reduce using rule 6
 
 
-State 34
+State 32
+
+	instructionSeq -> Name Colon Delimiter instructions Jump value .    (rule 8)
+
+	Delimiter      reduce using rule 8
+	%eof           reduce using rule 8
+
+
+State 33
 
 	instruction -> Register Assign Register Plus value .    (rule 5)
 
@@ -366,7 +341,7 @@ State 34
 -----------------------------------------------------------------------------
 Grammar Totals
 -----------------------------------------------------------------------------
-Number of rules: 18
+Number of rules: 16
 Number of terminals: 9
 Number of non-terminals: 7
-Number of states: 35
+Number of states: 34
