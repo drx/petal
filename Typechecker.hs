@@ -36,10 +36,18 @@ tci p g (IfJump r v) = if tcv p g (Register r) == TInt
 				else terror $ "r" ++ (show r) ++ " not Int"
 
 tcr :: Psi -> RegisterFile -> [Int] -> Gamma
+tcr [] _ _ = []
 --tcr p rf rs = 
 
+tch :: Heap -> Psi
+tch ((l,is):hs) = (l,tcis is):(tch hs)
+tch [] = []
+
+tcis :: InstructionSequence -> Type
+tcis (Seq l [] jv rs) = tc jv
+tcis (Seq l (c:cs) jv rs) = if tci p g
+
 tc (h, rf, i) = let 	p = tch h
-			rs = registersh h
 			g = tcr p rf rs in
 				(p, g, tcis p i)
 
