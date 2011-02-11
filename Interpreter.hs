@@ -1,7 +1,14 @@
 module Interpreter where
 
+import Prelude hiding (lex)
 import Syntax.Term
+import Syntax.Lexer
+import Syntax.Parser
 import Debug.Trace
+
+rep :: String -> IO ()
+rep = interpret . statify . parse . lex
+
 statify :: Program -> State
 statify (i:is) = (statify1 (i:is), [], i) where
                         statify1 :: Program -> Heap

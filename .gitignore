@@ -1,0 +1,5 @@
+*.swp
+Syntax/Lexer.hs
+Syntax/Parser.hs
+Syntax/grammar
+
