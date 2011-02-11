@@ -2,21 +2,21 @@ module Syntax.Term where
 
 import Data.List
 
-data Value = 	Int { getValue :: Int }
-		| Label { getLabel :: String }
-		| Register { getNumber :: Int }
-		deriving (Eq)
+data Value =    Int { getValue :: Int }
+                | Label { getLabel :: String }
+                | Register { getNumber :: Int }
+                deriving (Eq)
 
 instance Show Value where
-	show (Int n) = (show n)
-	show (Label l) = l
-	show (Register n) = "r" ++ (show n)
+        show (Int n) = (show n)
+        show (Label l) = l
+        show (Register n) = "r" ++ (show n)
 
-data Instruction = 	Assign Int Value
-			| AssignPlus Int Int Value
-			| IfJump Int Value
-			| Jump Value
-			deriving (Show, Eq)
+data Instruction =      Assign Int Value
+                        | AssignPlus Int Int Value
+                        | IfJump Int Value
+                        | Jump Value
+                        deriving (Show, Eq)
 
 type Heap = [(String, InstructionSequence)]
 type RegisterFile = [(Int, Value)]
