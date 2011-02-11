@@ -39,5 +39,5 @@ type Token = ((Int,Int), BaseToken)
 tokenWithPos :: AlexPosn -> BaseToken -> Token
 tokenWithPos (AlexPn _ line col) t  = ((line,col),t)
 
-lexer = alexScanTokens
+lex = alexScanTokens
 }

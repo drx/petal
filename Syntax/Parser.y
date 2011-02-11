@@ -1,6 +1,7 @@
 {
 module Syntax.Parser where
 
+import Prelude hiding (lex)
 import Syntax.Lexer
 import Syntax.Term
 import Data.List
