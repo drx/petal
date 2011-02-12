@@ -19,6 +19,13 @@ import Data.List
         If              { (_,TkIf)      }
         Int             { (_,TkInt $$)  }
         Jump            { (_,TkJump)    }
+	Mem             { (_,TkMem)     }
+	Malloc		{ (_,TkMalloc) }
+	Commit          { (_,TkCommit) }
+	Salloc          { (_,TkSalloc) }
+	Sfree           { (_,TkSfree) }
+	LBracket        { (_,TkLBracket) }
+	RBracket	{ (_,TkRBracket) }
         Name            { (_,TkName $$) }
         Register        { (_,TkRegister $$) }
         Plus            { (_,TkPlus)    }
@@ -38,6 +45,14 @@ instruction :: { Instruction }
 instruction:    Register Assign value                                   { Assign $1 $3 }
                 | Register Assign Register Plus value                   { AssignPlus $1 $3 $5 }
                 | If Register Jump value                                { IfJump $2 $4 }
+                | Register Assign Mem LBracket Register RBracket                { Load $1 $5 0 }
+                | Register Assign Mem LBracket Register Plus Int RBracket       { Load $1 $5 $7 }
+                | Mem LBracket Register Plus Int RBracket Assign Register       { Save $8 $3 $5 }
+                | Mem LBracket Register RBracket Assign Register                { Save $6 $3 0 }
+                | Register Assign Malloc Int                                    { Malloc $1 $4}
+                | Commit Register                                               { Commit $2 }
+                | Salloc Int                                                    { Salloc $2 }
+                | Sfree Int                                                     { Sfree $2 }
 
 instructionSeq :: { InstructionSequence }
 instructionSeq: Name Colon instructions Jump value                      { Seq $1 $3 $5 (nub $ (registers $3)++(registersv $5))}
@@ -57,9 +72,7 @@ program1:       program                                                 { $1 }
                 | Delimiter program                                     { $2 }
 
 {
-
 parseError :: [Token] -> a
 parseError (((line,col),t):xs) = error $ "Parse error at line " ++ (show line) ++ ", column " ++ (show col)
 parseError [] = error "Parse error at the end"
-
 }

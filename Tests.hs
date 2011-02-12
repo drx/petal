@@ -6,10 +6,18 @@ import Syntax.Parser
 import Syntax.Term
 import Interpreter
 
-someTest =  "start: r1 = 4 \n\
+tal1Test =  "start: r1 = mem[r2 + 5] \n\
+            \mem[r2 + 5] = r2 \n\
+            \r3 = malloc 3 \n\
+            \commit r4 \n\
+            \salloc 6 \n\
+            \sfree 2 \n\
+            \jump exit"
+
+tal0Test =  "start: r1 = 4 \n\
         \jump exit\n"
 
-someTest1 =     "start: \n\ 
+tal0Test1 =     "start: \n\ 
         \r1 = 4\n\n\
         \r0 = 1\n\ 
         \jump s2\n\
@@ -21,7 +29,7 @@ someTest1 =     "start: \n\
         \r12 = 4\n\
         \jump exit;comment trololol\n"
 
-someTest2 = "start: \n\ 
+tal0Test2 = "start: \n\ 
         \r1 = 4\n\n\
         \r0 = 0\n\ 
         \jump s2\n\
@@ -33,7 +41,7 @@ someTest2 = "start: \n\
         \r12 = 4\n\ 
         \jump exit;comment trololol\n"
 
-someTest3 =     "prod: r3 = 0; res = 0\n\ 
+tal0Test3 =     "prod: r3 = 0; res = 0\n\ 
         \r1 = 5\n\
         \r2 = 7\n\
         \jump loop\n\n\
