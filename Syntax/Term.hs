@@ -5,7 +5,12 @@ import Data.List
 data Value =    Int { getValue :: Int }
                 | Label { getLabel :: String }
                 | Register { getNumber :: Int }
+                | UPointer { getAddress :: HeapValue }
                 deriving (Eq)
+
+isStackPointer :: Value -> Bool
+isStackPointer (Register 0) = True
+isStackPointer _ = False
 
 instance Show Value where
         show (Int n) = (show n)
@@ -44,6 +49,9 @@ data Type =   TInt
             | TVar String 
             | TForall String Type 
             deriving (Show, Eq)
+
+data HeapValue =      Seq InstructionSequence
+                    | Tup [Value]
 
 data InstructionSequence = Seq {    getName :: String,
                                     getCode :: [Instruction],
