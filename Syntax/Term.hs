@@ -5,17 +5,18 @@ import Data.List
 data Value =    Int { getValue :: Int }
                 | Label { getLabel :: String }
                 | Register { getNumber :: Int }
-                | UPointer { getAddress :: HeapValue }
+                | UPointer { getHeapValue :: HeapValue }
                 deriving (Eq)
 
-isStackPointer :: Value -> Bool
-isStackPointer (Register 0) = True
+isStackPointer :: Int -> Bool
+isStackPointer  0 = True
 isStackPointer _ = False
 
 instance Show Value where
         show (Int n) = (show n)
         show (Label l) = l
         show (Register n) = "r" ++ (show n)
+        show (UPointer h) = "uptr(" ++ (show h) ++ ")"
 
 data Instruction =        Assign {  getAssignDestination :: Int,
                                     getAssignedValue :: Value }
@@ -38,7 +39,7 @@ data Instruction =        Assign {  getAssignDestination :: Int,
                         | Salloc {  getSallocCount :: Int }
                         deriving (Show, Eq)
 
-type Heap = [(String, InstructionSequence)]
+type Heap = [(String, HeapValue)]
 type RegisterFile = [(Int, Value)]
 type State = (Heap, RegisterFile, InstructionSequence)
 type Gamma = [(Int, Type)]
@@ -50,8 +51,9 @@ data Type =   TInt
             | TForall String Type 
             deriving (Show, Eq)
 
-data HeapValue =      Seq InstructionSequence
+data HeapValue =      HeapSeq InstructionSequence
                     | Tup [Value]
+                    deriving (Show, Eq)
 
 data InstructionSequence = Seq {    getName :: String,
                                     getCode :: [Instruction],
