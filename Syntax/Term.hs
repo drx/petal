@@ -65,7 +65,13 @@ data Type =   TInt
             | TUPtr AType
             deriving (Eq, Ord)
 
-data AType = ATEmpty | ATValue Type | ATAdjacent AType AType | ATVar String deriving (Eq, Ord, Show)
+data AType = ATEmpty | ATValue Type | ATAdjacent AType AType | ATVar String deriving (Eq, Ord)
+instance Show AType where
+    show ATEmpty = ""
+    show (ATValue t) = show t
+    show (ATVar v) = v
+    show (ATAdjacent t ATEmpty) = show t
+    show (ATAdjacent t ts) = show t ++ "," ++ show ts
 
 instance Show Type where
     show TInt = "int"
