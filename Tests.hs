@@ -53,44 +53,35 @@ tal1Test4 = "copy: code{}\n\
             \r1 = malloc 2;\n\
             \jump exit;"
 
-tal0Test =  "start: code{}\n\
+tal0Test =  "start: code{r1:int}\n\
         \r1 = 4 \n\
         \jump exit\n"
 
-tal0Test1 =     "start: \n\ 
+tal0Test1 =     "start: code{r0: int, r1:int, r12:int, r33:int}\n\ 
         \r1 = 4\n\n\
         \r0 = 1\n\ 
         \jump s2\n\
 
-        \trololol: r33 = r1 + 1\n\
+        \trololol: code{r0:int, r1:int, r12:int, r33:int}\n\
+        \r33 = r1 + 1\n\
         \ jump exit\n\ 
 
-        \s2: if r0 jump trololol\n\ 
+        \s2: code{r0:int, r1:int, r12:int, r33:int}\n\
+        \if r0 jump trololol\n\ 
         \r12 = 4\n\
         \jump exit;comment trololol\n"
 
-tal0Test2 = "start: \n\ 
-        \r1 = 4\n\n\
-        \r0 = 0\n\ 
-        \jump s2\n\
-
-        \trololol: r33 = r1 + 1\n\
-        \ jump exit\n\ 
-
-        \s2: if r0 jump trololol\n\ 
-        \r12 = 4\n\ 
-        \jump exit;comment trololol\n"
-
-tal0Test3 = "prod: code{} \n\
+tal0Test2 = "prod: code{r1:int, r2:int, r3:int} \n\
             \r3 = 0; res = 0\n\ 
             \r1 = 5\n\
             \r2 = 7\n\
             \jump loop\n\n\
 
-            \loop: if r1 jump done; if a == 0 goto done\n\
+            \loop: code{r1:int, r2:int, r3:int}\n\
+            \if r1 jump done; if a == 0 goto done\n\
             \r3 = r2 + r3; res = res + b\n\
             \r1 = r1 + -1; a = a - 1\n\
             \jump loop\n\n\
 
-            \done:\n\
+            \done: code{r1:int, r2:int, r3:int}\n\
             \jump exit\n\n"
