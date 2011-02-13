@@ -107,6 +107,7 @@ instance Show InstructionSequence where
                             "jump " ++ (show v) where
                                 showRegisters (r:rs) | rs /= [] = "r" ++ (show r) ++ ", " ++ (showRegisters rs)
                                                      | otherwise = "r" ++ (show r)
+                                showRegisters [] = ""
 
 type Program = [InstructionSequence]
 

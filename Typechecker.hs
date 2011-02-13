@@ -93,6 +93,8 @@ tii psi ins gamma = case ins of
         where
             tau = tiop psi gamma v
     AssignPlus d s v | (tcop psi gamma (Register s) TInt) && (tcop psi gamma v TInt) -> gammasubst gamma d TInt
+                     | (tcop psi gamma (Register s) TInt) -> error $ "Value not an integer: " ++ (show v)
+                     | otherwise -> error $ "Register doesn't contain an integer: " ++ (show (Register s))
     IfJump s v ->
         if (tcop psi gamma (Register s) TInt) then
             if (tcop psi gamma v (TCode gamma)) then
@@ -143,6 +145,7 @@ tii psi ins gamma = case ins of
 adjindex (ATValue t) 1 = t
 adjindex (ATAdjacent (ATValue t) ts) 1 = t
 adjindex (ATAdjacent t ts) n = adjindex ts (n-1)
+adjindex v n = error $ show (v,n)
 
 adjupdate (ATValue t) 1 tau = ATValue tau
 adjupdate (ATAdjacent (ATValue _) ts) 1 tau = ATAdjacent (ATValue tau) ts
