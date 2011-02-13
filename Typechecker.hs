@@ -45,12 +45,15 @@ tcr :: Psi -> RegisterFile -> Gamma -> Bool
 tcr psi rf gamma = all (\(n,v) -> tcv psi v $ gammaLookup gamma n) rf
 
 tciseq :: Psi -> InstructionSequence -> Type -> Bool
-tciseq psi i t@(TCode gamma) =
+tciseq psi i (TCode gamma) =
     if null (getCode i) then
-        tcop psi gamma (getJump i) t
+        tcop psi gamma (getJump i) (TCode gamma)
     else
         let gamma2 = tii psi (head $ getCode i) gamma
          in tciseq psi (i { getCode = tail (getCode i) }) (TCode gamma2)
+
+tciseq psi i (TForall a t) =
+    tciseq psi i t
 
 tcop :: Psi -> Gamma -> Value -> Type -> Bool
 tcop psi gamma v t = t == tiop psi gamma v
@@ -66,6 +69,7 @@ tiv psi v = case v of
 tiop :: Psi -> Gamma -> Value -> Type
 tiop psi gamma v = case v of
     Register r -> gammaLookup gamma r
+            
     _ -> tiv psi v
 
 tii :: Psi -> Instruction -> Gamma -> Gamma
