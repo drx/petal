@@ -26,7 +26,7 @@ type Gamma = [(Int, Type)]
 type Psi = [(String, Type)]
 data Type = TInt |TCode {getGamma :: Gamma} | TVar String | TForall String Type deriving (Show, Eq, Ord)
 
-data InstructionSequence = Seq {getName :: String, getCode :: [Instruction], getJump :: Value, getRegisters :: [Int] } deriving (Show, Eq)
+data InstructionSequence = Seq {getName :: String, getCode :: [Instruction], getJump :: Value, getRegisters :: [Int], getAscription :: Type } deriving (Show, Eq)
 type Program = [InstructionSequence]
 
 exit = "exit"
@@ -48,3 +48,10 @@ registers ((AssignPlus n1 n2 v):is) = [n1,n2] ++ (registersv v) ++ (registers is
 registers ((IfJump n v):is) = n:(registersv v) ++ (registers is)
 registers ((Jump v):is) = (registersv v) ++ (registers is)
 registers [] = []
+
+statify :: Program -> State
+statify (i:is) = (statify1 (i:is), [], i) where
+                        statify1 :: Program -> Heap
+                        statify1 (i@(Seq l iss jv rs t):is) = (l,i):(statify1 is)
+                        statify1 [] = []
+

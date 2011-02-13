@@ -22,6 +22,13 @@ import Data.List
         Name            { (_,TkName $$) }
         Register        { (_,TkRegister $$) }
         Plus            { (_,TkPlus)    }
+        LCBrace         { (_,TkLCBrace)    }
+        RCBrace         { (_,TkRCBrace)    }
+        Dot             { (_,TkDot)    }
+        Comma           { (_,TkComma)    }
+        Lambda          { (_,TkLambda)    }
+        TInt            { (_,TkTInt)    }
+        TCode           { (_,TkTCode)    }
 
 %left Delimiter
 %left If Jump
@@ -40,8 +47,20 @@ instruction:    Register Assign value                                   { Assign
                 | If Register Jump value                                { IfJump $2 $4 }
 
 instructionSeq :: { InstructionSequence }
-instructionSeq: Name Colon instructions Jump value                      { Seq $1 $3 $5 (nub $ (registers $3)++(registersv $5))}
-                | Name Colon Delimiter instructions Jump value          { Seq $1 $4 $6 (nub $ (registersv $6)++(registers $4)) }
+instructionSeq: Name Colon type Delimiter instructions Jump value          { Seq $1 $5 $7 (nub $ (registersv $7)++(registers $5)) $3 }
+
+type :: { Type }
+type: TInt { TInt }
+      | TCode gamma { TCode $2 }
+      | Lambda Name Dot type { TForall $2 $4 }
+      | Name { TVar $1 }
+
+gamma :: { Gamma }
+gamma: LCBrace registertypes RCBrace { $2 }
+
+registertypes :: { Gamma }
+registertypes: Register Colon type { [($1,$3)] }
+               | Register Colon type Comma registertypes { [($1,$3)] ++ $5 }
 
 instructions :: { [Instruction] }
 instructions:   instruction Delimiter instructions                      { $1:$3 }

@@ -1,6 +1,9 @@
 module Typechecker where
 
+import Prelude hiding (lex)
 import Syntax.Term
+import Syntax.Lexer
+import Syntax.Parser
 import Data.List
 
 
@@ -21,8 +24,18 @@ heapLookup = lookupErr $ \l -> "Block does not exist: " ++ l
 gammasubst :: Gamma -> Int -> Type -> Gamma
 gammasubst g r t = sort $ (r,t):(filter (\x -> fst x /= r) g)
 
-tc :: (Heap, RegisterFile, InstructionSequence) -> Psi -> Gamma -> Bool
-tc (h, rf, i) psi gamma = and [tch h psi, tcr psi rf gamma, tciseq psi i (TCode gamma)]
+psify :: Program -> Psi
+psify [] = []
+psify ((Seq l _ _ _ t):is) = (l,t):psify is
+
+--tc :: Program -> Bool
+tc p = all (\(l,i) -> tcm (heap, [], i) psi (getGamma (getAscription i))) heap
+    where
+        (heap, _, _) = statify p
+        psi = psify p
+
+tcm :: State -> Psi -> Gamma -> Bool
+tcm (h, rf, i) psi gamma = and [tch h psi, tcr psi rf gamma, tciseq psi i (TCode gamma)]
 
 tch :: Heap -> Psi -> Bool
 tch h psi = all (\(l,t) -> tciseq psi (heapLookup h l) t && null (ftv t)) psi

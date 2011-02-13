@@ -7,16 +7,10 @@ import Syntax.Term
 import Interpreter
 import Typechecker
 
-typecheckTest1 =
-    let 
-        program = "loop: r3 = r2 + r3\n\
+typecheckTest1 = "loop: code{r1: int, r2: int, r3: int}\n\
+            \r3 = r2 + r3\n\
             \r1 = r1 + -1\n\
             \jump loop\n"
-        m = statify $ parse $ lex $ program
-        gamma = [(1::Int,TInt),(2::Int,TInt),(3::Int,TInt)]
-        psi = [("loop",TCode(gamma))]
-    in
-        tc m psi gamma
 
 someTest =  "start: r1 = 4 \n\
         \jump exit\n"
