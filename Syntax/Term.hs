@@ -67,8 +67,8 @@ instance Show Type where
     show TInt = "int"
     show (TVar s) = s
     show (TForall s t) = "forall " ++ s ++ "." ++ (show t)
-    show (TCode g) = "code{" ++ unlines (showGamma g) ++ "}" where
-        showGamma ((n,t):gs) = ("r" ++ (show n) ++ " :: " ++ (show t)):(showGamma gs)
+    show (TCode g) = "code{" ++ intercalate ", " (showGamma g) ++ "}" where
+        showGamma ((n,t):gs) = ("r" ++ (show n) ++ ":" ++ (show t)):(showGamma gs)
         showGamma [] = []
 
 data HeapValue =      HeapSeq { getHeapSequence :: InstructionSequence }

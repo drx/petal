@@ -27,7 +27,15 @@ psify :: Program -> Psi
 psify [] = []
 psify ((Seq l _ _ _ t):is) = (l,t):psify is
 
+rtp :: String -> Bool
 rtp = tc . parse . lex
+
+retp = (mapM_ (print . (\(l,t) -> l ++ " (" ++ (if fst t then "OK" else "wrong type") ++ "): " ++ show (snd t)))) . exittypes . parse . lex
+
+exittypes p = map (\(l,t) -> (l, (tciseq psi (getHeapSequence $ heapLookup heap l) t))) psi
+    where
+        (heap, _, _) = statify p
+        psi = psify p
 
 tc :: Program -> Bool
 tc p = all (\(l,i) -> tcm (heap, [], getHeapSequence i) psi (getGamma (getAscription $ getHeapSequence i))) heap
@@ -36,18 +44,19 @@ tc p = all (\(l,i) -> tcm (heap, [], getHeapSequence i) psi (getGamma (getAscrip
         psi = (exit,TCode []):psify p
 
 tcm :: State -> Psi -> Gamma -> Bool
-tcm (h, rf, i) psi gamma = and [tch h psi, tcr psi rf gamma, tciseq psi i (TCode gamma)]
+tcm (h, rf, i) psi gamma = and [tch h psi, tcr psi rf gamma, fst $ tciseq psi i (TCode gamma)]
 
 tch :: Heap -> Psi -> Bool
-tch h psi = all (\(l,t) -> l == exit || tciseq psi (getHeapSequence $ heapLookup h l) t && null (ftv t)) psi
+tch h psi = all (\(l,t) -> l == exit || fst (tciseq psi (getHeapSequence $ heapLookup h l) t) && null (ftv t)) psi
 
 tcr :: Psi -> RegisterFile -> Gamma -> Bool
 tcr psi rf gamma = all (\(n,v) -> tcv psi v $ gammaLookup gamma n) rf
 
-tciseq :: Psi -> InstructionSequence -> Type -> Bool
+tciseq :: Psi -> InstructionSequence -> Type -> (Bool, Type)
 tciseq psi i (TCode gamma) =
     if null (getCode i) then
-        tcop psi gamma (getJump i) (TCode gamma)
+        (if (getLabel $ getJump i) == exit then True else
+            tcop psi gamma (getJump i) (TCode gamma), TCode gamma)
     else
         let gamma2 = tii psi (head $ getCode i) gamma
          in tciseq psi (i { getCode = tail (getCode i) }) (TCode gamma2)
@@ -76,4 +85,11 @@ tii :: Psi -> Instruction -> Gamma -> Gamma
 tii psi ins gamma = case ins of
     Assign d v -> gammasubst gamma d (tiop psi gamma v)
     AssignPlus d s v | (tcop psi gamma (Register s) TInt) && (tcop psi gamma v TInt) -> gammasubst gamma d TInt
-    IfJump s v | (tcop psi gamma (Register s) TInt) && (tcop psi gamma v (TCode gamma)) -> gamma
+    IfJump s v ->
+        if (tcop psi gamma (Register s) TInt) then
+            if (tcop psi gamma v (TCode gamma)) then
+                gamma
+            else
+                error $ "Type mismatch in jump: " ++ show ins
+        else
+            error $ "If operand not an int: " ++ show ins
