@@ -14,6 +14,26 @@ tal1Test =  "start: r1 = mem[r2 + 5] \n\
             \sfree 2 \n\
             \jump exit"
 
+tal1Test1 = "copy:\n\
+            \r1 = malloc 2;\n\
+            \r2 = 5;\n\
+            \r3 = 3;\n\
+            \mem[r1+1] = r2;\n\
+            \mem[r1+2] = r3;\n\
+            \r4 = mem[r1+1]\n\
+            \r5 = mem[r1+2]\n\
+            \commit r1;\n\
+            \jump exit;"
+
+tal1Test2 = "copy: ; {r1:ptr(int,int), r2,r3:int}\n\
+            \r2 = malloc 2;\n\
+            \r3 = mem[r1];\n\
+            \mem[r2] = r3;\n\
+            \r3 = mem[r1+1];\n\
+            \mem[r2+1] = r3;\n\
+            \commit r2;\n\
+            \jump exit;{r1:ptr(int,int), r2:ptr(int,int), r3:int }"
+
 tal0Test =  "start: r1 = 4 \n\
         \jump exit\n"
 
