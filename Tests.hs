@@ -49,7 +49,7 @@ test In 1 = "copy: code{}\n\
             \commit r1;\n\
             \jump exit;"
 
-test In 2 = "troll: code{}\n\
+test In 2 = "troll: code{r0: uptr()}\n\
             \salloc 2\n\
             \r1 = 5\n\
             \r2 = 7\n\
@@ -58,7 +58,7 @@ test In 2 = "troll: code{}\n\
             \sfree 1\n\
             \jump exit"
 
-test In 3 = "copy: code{r1:ptr(int,int), r2,r3:int}\n\
+test In 3 = "copy: code{r1:ptr(int,int), r2:int,r3:int}\n\
             \r2 = malloc 2;\n\
             \r3 = mem[r1+1];\n\
             \mem[r2+1] = r3;\n\

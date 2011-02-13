@@ -76,6 +76,7 @@ type: TInt { TInt }
 
 atype: type { ATValue $1 }
         | type Comma atype { ATAdjacent (ATValue $1) $3 }
+        | { ATEmpty }
 
 gamma :: { Gamma }
 gamma: 		LCBrace registertypes RCBrace { $2 }
@@ -100,6 +101,6 @@ program1:       program                                                 { $1 }
 
 {
 parseError :: [Token] -> a
-parseError (((line,col),t):xs) = error $ "Parse error at line " ++ (show line) ++ ", column " ++ (show col)
+parseError (((line,col),t):xs) = error $ "Parse error at line " ++ (show line) ++ ", column " ++ (show col) ++ " (" ++ show t ++ ")"
 parseError [] = error "Parse error at the end"
 }

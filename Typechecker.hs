@@ -82,7 +82,7 @@ tiop psi gamma v = case v of
     _ -> tiv psi v
 
 tihv :: Psi -> Gamma -> HeapValue -> AType
-tihv psi gamma (Tup vs) = foldr1 ATAdjacent $ map (ATValue . (tiop psi gamma)) vs
+tihv psi gamma (Tup vs) = foldr ATAdjacent ATEmpty $ map (ATValue . (tiop psi gamma)) vs
 
 tii :: Psi -> Instruction -> Gamma -> Gamma
 tii psi ins gamma = case ins of
@@ -102,7 +102,7 @@ tii psi ins gamma = case ins of
         else
             error $ "If operand not an int: " ++ show ins
 
-    Malloc d n -> if n >= 0 then gammasubst gamma d $ TUPtr $ foldr1 ATAdjacent $ replicate n $ ATValue TInt
+    Malloc d n -> if n >= 0 then gammasubst gamma d $ TUPtr $ foldr ATAdjacent ATEmpty $ replicate n $ ATValue TInt
         else error $ "Cannot malloc negative n: " ++ show ins
         
     Commit d -> if d /= 0 then
