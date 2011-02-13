@@ -36,9 +36,9 @@ tal1Test2 = "troll:\n\
 
 tal1Test3 = "copy: ; {r1:ptr(int,int), r2,r3:int}\n\
             \r2 = malloc 2;\n\
-            \r3 = mem[r1];\n\
-            \mem[r2] = r3;\n\
             \r3 = mem[r1+1];\n\
+            \mem[r2+1] = r3;\n\
+            \r3 = mem[r1+2];\n\
             \mem[r2+1] = r3;\n\
             \commit r2;\n\
             \jump exit;{r1:ptr(int,int), r2:ptr(int,int), r3:int }"
