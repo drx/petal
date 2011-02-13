@@ -50,6 +50,7 @@ data BaseToken =
         | TkTInt
         | TkTCode
         | TkMem
+	| TkMalloc
         | TkCommit
         | TkSalloc
         | TkSfree

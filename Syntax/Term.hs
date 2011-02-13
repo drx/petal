@@ -70,7 +70,7 @@ data HeapValue =      HeapSeq InstructionSequence
 data InstructionSequence = Seq {    getName :: String,
                                     getCode :: [Instruction],
                                     getJump :: Value,
-                                    getRegisters :: [Int]
+                                    getRegisters :: [Int],
                                     getAscription :: Type } 
                                     deriving (Eq)
 
@@ -110,8 +110,8 @@ registers ((Sfree n):is) = (registers is)
 registers [] = []
 
 statify :: Program -> State
-statify (i:is) = (statify1 (i:is), [], i) where
-                        statify1 :: Program -> Heap
-                        statify1 (i@(Seq l iss jv rs t):is) = (l,i):(statify1 is)
-                        statify1 [] = []
+statify (i:is) = (statify1 (i:is), [(0, UPointer $ Tup [])], i) where
+    statify1 :: Program -> Heap
+    statify1 (i@(Seq l iss jv rs t):is) = (l,HeapSeq i):(statify1 is)
+    statify1 [] = []
 
