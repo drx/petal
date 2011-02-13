@@ -1,7 +1,5 @@
 {
-
 module Syntax.Lexer where
-
 }
 
 %wrapper "posn"
@@ -19,6 +17,13 @@ tokens :-
         jump                            { \p s -> tokenWithPos p TkJump }
         int                             { \p s -> tokenWithPos p TkTInt }
         code                            { \p s -> tokenWithPos p TkTCode }
+        mem                             { \p s -> tokenWithPos p TkMem }
+        malloc                          { \p s -> tokenWithPos p TkMalloc }
+        commit                          { \p s -> tokenWithPos p TkCommit }
+        salloc                          { \p s -> tokenWithPos p TkSalloc }
+        sfree                           { \p s -> tokenWithPos p TkSfree }
+        "["                             { \p s -> tokenWithPos p TkLBracket }
+        "]"                             { \p s -> tokenWithPos p TkRBracket }
         "+"                             { \p s -> tokenWithPos p TkPlus }
         "="                             { \p s -> tokenWithPos p TkAssign }
         ":"                             { \p s -> tokenWithPos p TkColon }
@@ -44,6 +49,12 @@ data BaseToken =
         | TkDot
         | TkTInt
         | TkTCode
+        | TkMem
+        | TkCommit
+        | TkSalloc
+        | TkSfree
+        | TkLBracket
+        | TkRBracket
         | TkRegister Int
         | TkName String                     
         deriving (Show, Eq)

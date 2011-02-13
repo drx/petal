@@ -12,10 +12,47 @@ typecheckTest1 = "loop: code{r1: int, r2: int, r3: int}\n\
             \r1 = r1 + -1\n\
             \jump loop\n"
 
-someTest =  "start: r1 = 4 \n\
+tal1Test =  "start: r1 = mem[r2 + 5] \n\
+            \mem[r2 + 5] = r2 \n\
+            \r3 = malloc 3 \n\
+            \commit r4 \n\
+            \salloc 6 \n\
+            \sfree 2 \n\
+            \jump exit"
+
+tal1Test1 = "copy:\n\
+            \r1 = malloc 2;\n\
+            \r2 = 5;\n\
+            \r3 = 3;\n\
+            \mem[r1+1] = r2;\n\
+            \mem[r1+2] = r3;\n\
+            \r4 = mem[r1+1]\n\
+            \r5 = mem[r1+2]\n\
+            \commit r1;\n\
+            \jump exit;"
+
+tal1Test2 = "troll:\n\
+            \salloc 2\n\
+            \r1 = 5\n\
+            \r2 = 7\n\
+            \mem[r0+1] = r1\n\
+            \mem[r0+2] = r2\n\
+            \sfree 1\n\
+            \jump exit"
+
+tal1Test3 = "copy: ; {r1:ptr(int,int), r2,r3:int}\n\
+            \r2 = malloc 2;\n\
+            \r3 = mem[r1+1];\n\
+            \mem[r2+1] = r3;\n\
+            \r3 = mem[r1+2];\n\
+            \mem[r2+1] = r3;\n\
+            \commit r2;\n\
+            \jump exit;{r1:ptr(int,int), r2:ptr(int,int), r3:int }"
+
+tal0Test =  "start: r1 = 4 \n\
         \jump exit\n"
 
-someTest1 =     "start: \n\ 
+tal0Test1 =     "start: \n\ 
         \r1 = 4\n\n\
         \r0 = 1\n\ 
         \jump s2\n\
@@ -27,7 +64,7 @@ someTest1 =     "start: \n\
         \r12 = 4\n\
         \jump exit;comment trololol\n"
 
-someTest2 = "start: \n\ 
+tal0Test2 = "start: \n\ 
         \r1 = 4\n\n\
         \r0 = 0\n\ 
         \jump s2\n\
@@ -39,7 +76,7 @@ someTest2 = "start: \n\
         \r12 = 4\n\ 
         \jump exit;comment trololol\n"
 
-someTest3 =     "prod: r3 = 0; res = 0\n\ 
+tal0Test3 =     "prod: r3 = 0; res = 0\n\ 
         \r1 = 5\n\
         \r2 = 7\n\
         \jump loop\n\n\
