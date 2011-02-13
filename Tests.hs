@@ -7,31 +7,28 @@ import Syntax.Term
 import Interpreter
 import Typechecker
 import Control.Exception
-import System.Process
-import GHC.IO.Exception
+import System.Console.ANSI
 
-color n = do    pid <- runCommand ( "echo -en '\\e[" ++ (show n) ++ "m'")
-                waitForProcess pid 
-
-greenColor = color 32
-yellowColor = color 33
-redColor = color 31
-blueColor = color 34
-resetColor = color 0
+greenColor = setSGR [SetColor Foreground Vivid Green]
+yellowColor = setSGR [SetColor Foreground Vivid Yellow]
+redColor = setSGR [SetColor Foreground Vivid Red]
+cyanColor = setSGR [SetColor Foreground Vivid Cyan]
+resetColor = setSGR [Reset]
 
 data TestType = In | Tc
 
 runTcTests :: IO()
 runTests fun tp nm rng = mapM_ (\x -> do
-    blueColor
+    cyanColor
     putStrLn (nm ++ " Test #" ++ show x)
+    resetColor
     catch (do 
         fun (test tp x) 
         greenColor
         putStrLn "Passed"
         resetColor) ((\ex -> do yellowColor 
                                 putStrLn $"\nException caught: " ++ (show ex)
-                                resetColor) :: SomeException -> IO GHC.IO.Exception.ExitCode)) rng
+                                resetColor) :: SomeException -> IO ())) rng
 
 runInTests = runTests rep In "Interpreter" [0..12]
 runTcTests = runTests retp Tc "Typechecker" [0..1]
