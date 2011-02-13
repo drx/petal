@@ -21,6 +21,7 @@ tokens :-
         malloc                          { \p s -> tokenWithPos p TkMalloc }
         commit                          { \p s -> tokenWithPos p TkCommit }
         salloc                          { \p s -> tokenWithPos p TkSalloc }
+	sp				{ \p s -> tokenWithPos p (TkRegister 0) }
         sfree                           { \p s -> tokenWithPos p TkSfree }
         "["                             { \p s -> tokenWithPos p TkLBracket }
         "]"                             { \p s -> tokenWithPos p TkRBracket }
