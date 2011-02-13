@@ -144,8 +144,10 @@ adjindex (ATValue t) 1 = t
 adjindex (ATAdjacent (ATValue t) ts) 1 = t
 adjindex (ATAdjacent t ts) n = adjindex ts (n-1)
 
+adjupdate (ATValue t) 1 tau = ATValue tau
 adjupdate (ATAdjacent (ATValue _) ts) 1 tau = ATAdjacent (ATValue tau) ts
 adjupdate (ATAdjacent t ts) n tau = ATAdjacent t $ adjupdate ts (n-1) tau
+adjupdate a b c = error $ show (a,b,c)
 
 adjdrop (ATAdjacent _ ts) 1 = ts
 adjdrop (ATAdjacent t ts) n = adjdrop ts (n-1)
