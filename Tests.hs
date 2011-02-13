@@ -20,7 +20,7 @@ tal1Test =  "start: r1 = mem[r2 + 5] \n\
             \sfree 2 \n\
             \jump exit"
 
-tal1Test1 = "copy:\n\
+tal1Test1 = "copy: code{}\n\
             \r1 = malloc 2;\n\
             \r2 = 5;\n\
             \r3 = 3;\n\
@@ -49,7 +49,12 @@ tal1Test3 = "copy: ; {r1:ptr(int,int), r2,r3:int}\n\
             \commit r2;\n\
             \jump exit;{r1:ptr(int,int), r2:ptr(int,int), r3:int }"
 
-tal0Test =  "start: r1 = 4 \n\
+tal1Test4 = "copy: code{}\n\
+            \r1 = malloc 2;\n\
+            \jump exit;"
+
+tal0Test =  "start: code{}\n\
+        \r1 = 4 \n\
         \jump exit\n"
 
 tal0Test1 =     "start: \n\ 

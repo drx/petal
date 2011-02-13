@@ -69,7 +69,8 @@ type: TInt { TInt }
       | Name { TVar $1 }
 
 gamma :: { Gamma }
-gamma: LCBrace registertypes RCBrace { $2 }
+gamma: 		LCBrace registertypes RCBrace { $2 }
+       		| LCBrace RCBrace { [] }
 
 registertypes :: { Gamma }
 registertypes: Register Colon type { [($1,$3)] }

@@ -61,11 +61,26 @@ data Type =   TInt
             | TCode {getGamma :: Gamma} 
             | TVar String 
             | TForall String Type 
-            deriving (Show, Eq, Ord)
+            deriving (Eq, Ord)
+
+instance Show Type where
+    show TInt = "int"
+    show (TVar s) = s
+    show (TForall s t) = "forall " ++ s ++ "." ++ (show t)
+    show (TCode g) = "code{" ++ unlines (showGamma g) ++ "}" where
+        showGamma ((n,t):gs) = ("r" ++ (show n) ++ " :: " ++ (show t)):(showGamma gs)
+        showGamma [] = []
 
 data HeapValue =      HeapSeq { getHeapSequence :: InstructionSequence }
                     | Tup {     getTuple :: [Value] }
-                    deriving (Show, Eq)
+                    deriving (Eq)
+
+instance Show HeapValue where
+    show (HeapSeq i) = show i
+    show (Tup i) = "<" ++ showValues i ++ ">" where
+        showValues (v:vs)   | vs == [] = show v
+                            | otherwise = (show v) ++ ", " ++ (showValues vs)
+        showValues ([]) = ""
 
 data InstructionSequence = Seq {    getName :: String,
                                     getCode :: [Instruction],
@@ -75,7 +90,7 @@ data InstructionSequence = Seq {    getName :: String,
                                     deriving (Eq)
 
 instance Show InstructionSequence where
-    show (Seq s is v rs t) = s ++ "(" ++ (showRegisters rs) ++ "): " ++ show t ++ "\n" ++
+    show (Seq s is v rs t) = s ++ "(" ++ (showRegisters rs) ++ "): " ++ (show t) ++ "\n" ++
                             (unlines (map show is)) ++
                             "jump " ++ (show v) where
                                 showRegisters (r:rs) | rs /= [] = "r" ++ (show r) ++ ", " ++ (showRegisters rs)

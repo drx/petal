@@ -6,7 +6,6 @@ import Syntax.Lexer
 import Syntax.Parser
 import Data.List
 
-
 lookupErr :: (Eq a) => (a -> String) -> [(a,b)] -> a -> b
 lookupErr erf assoc k = case lookup k assoc of
                 Just v -> v
