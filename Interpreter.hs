@@ -14,7 +14,7 @@ rep :: String -> IO ()
 rep = interpret . statify . parse . lex
 
 statify :: Program -> State
-statify (i:is) = (statify1 (i:is), [], i) where
+statify (i:is) = (statify1 (i:is), [(0, UPointer $ Tup [])], i) where
     statify1 :: Program -> Heap
     statify1 (i@(Seq l iss jv rs):is) = (l,HeapSeq i):(statify1 is)
     statify1 [] = []

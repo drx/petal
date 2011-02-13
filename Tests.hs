@@ -25,7 +25,16 @@ tal1Test1 = "copy:\n\
             \commit r1;\n\
             \jump exit;"
 
-tal1Test2 = "copy: ; {r1:ptr(int,int), r2,r3:int}\n\
+tal1Test2 = "troll:\n\
+            \salloc 2\n\
+            \r1 = 5\n\
+            \r2 = 7\n\
+            \mem[r0+1] = r1\n\
+            \mem[r0+2] = r2\n\
+            \sfree 1\n\
+            \jump exit"
+
+tal1Test3 = "copy: ; {r1:ptr(int,int), r2,r3:int}\n\
             \r2 = malloc 2;\n\
             \r3 = mem[r1];\n\
             \mem[r2] = r3;\n\
