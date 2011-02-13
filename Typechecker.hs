@@ -4,52 +4,58 @@ import Syntax.Term
 import Data.List
 
 
-psi :: Psi -> String -> Type
-psi p s = case lookup s p of
-                Just tp -> tp
-                Nothing -> error $ "No such code labelled " ++ s
+lookupErr :: (Eq a) => (a -> String) -> [(a,b)] -> a -> b
+lookupErr erf assoc k = case lookup k assoc of
+                Just v -> v
+                Nothing -> error $ erf k
 
-gamma :: Gamma -> Int -> Type
-gamma g n = case lookup n g of
-                Just tp -> tp
-                Nothing -> error $ "No such register r" ++ (show n)
+psiLookup :: Psi -> String -> Type
+psiLookup = lookupErr $ \l -> "Block does not exist: " ++ l
+
+gammaLookup :: Gamma -> Int -> Type
+gammaLookup = lookupErr $ \n -> "Register does not exist: r" ++ show n
+
+heapLookup :: Heap -> String -> InstructionSequence
+heapLookup = lookupErr $ \l -> "Block does not exist: " ++ l
 
 gammasubst :: Gamma -> Int -> Type -> Gamma
-gammasubst g r t = (r,t):(filter (\x -> fst x /= r) g)
+gammasubst g r t = sort $ (r,t):(filter (\x -> fst x /= r) g)
 
-tcv :: Psi -> Gamma -> Value -> Type
-tcv p g (Int n) = TInt
-tcv p g (Label l) = psi p l
-tcv p g (Register n) = gamma g n
+tc :: (Heap, RegisterFile, InstructionSequence) -> Psi -> Gamma -> Bool
+tc (h, rf, i) psi gamma = and [tch h psi, tcr psi rf gamma, tciseq psi i (TCode gamma)]
 
-tci :: Psi -> Gamma -> Instruction -> (Gamma, Gamma)
-tci p g (Assign r v) = (g, gammasubst g r (tcv p g v))
-tci p g (AssignPlus r1 r2 v) = if (tcv p g (Register r1) == TInt)
-                                        then if (tcv p g v == TInt)
-                                                then (g, gammasubst g r1 TInt)
-                                                else terror $ (show v) ++ " not Int"
-                                        else terror $ "r" ++ (show r2) ++ " not Int"
-tci p g (IfJump r v) = if tcv p g (Register r) == TInt
-                                then if tcv p g v == TCode g
-                                        then (g, g)
-                                        else terror $ (show v) ++ " not the type of code("++(show g)++")"
-                                else terror $ "r" ++ (show r) ++ " not Int"
+tch :: Heap -> Psi -> Bool
+tch h psi = all (\(l,t) -> tciseq psi (heapLookup h l) t && null (ftv t)) psi
 
-tcr :: Psi -> RegisterFile -> [Int] -> Gamma
-tcr [] _ _ = []
---tcr p rf rs = 
+tcr :: Psi -> RegisterFile -> Gamma -> Bool
+tcr psi rf gamma = all (\(n,v) -> tcv psi v $ gammaLookup gamma n) rf
 
-tch :: Heap -> Psi
-tch ((l,is):hs) = (l,tcis is):(tch hs)
-tch [] = []
+tciseq :: Psi -> InstructionSequence -> Type -> Bool
+tciseq psi i t@(TCode gamma) =
+    if null (getCode i) then
+        tcop psi gamma (getJump i) t
+    else
+        let gamma2 = tii psi (head $ getCode i) gamma
+         in tciseq psi (i { getCode = tail (getCode i) }) (TCode gamma2)
 
-tcis :: InstructionSequence -> Type
-tcis (Seq l [] jv rs) = tc jv
-tcis (Seq l (c:cs) jv rs) = if tci p g
+tcop :: Psi -> Gamma -> Value -> Type -> Bool
+tcop psi gamma v t = t == tiop psi gamma v
 
-tc (h, rf, i) = let     p = tch h
-                        g = tcr p rf rs in
-                                (p, g, tcis p i)
+tcv :: Psi -> Value -> Type -> Bool
+tcv psi v t = t == tiv psi v
 
-terror :: String -> a
-terror s = error $ "type error: " ++ s
+tiv :: Psi -> Value -> Type
+tiv psi v = case v of 
+    Int _ -> TInt
+    Label l -> psiLookup psi l
+
+tiop :: Psi -> Gamma -> Value -> Type
+tiop psi gamma v = case v of
+    Register r -> gammaLookup gamma r
+    _ -> tiv psi v
+
+tii :: Psi -> Instruction -> Gamma -> Gamma
+tii psi ins gamma = case ins of
+    Assign d v -> gammasubst gamma d (tiop psi gamma v)
+    AssignPlus d s v | (tcop psi gamma (Register s) TInt) && (tcop psi gamma v TInt) -> gammasubst gamma d TInt
+    IfJump s v | (tcop psi gamma (Register s) TInt) && (tcop psi gamma v (TCode gamma)) -> gamma

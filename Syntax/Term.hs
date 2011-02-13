@@ -24,7 +24,7 @@ type State = (Heap, RegisterFile, InstructionSequence)
 
 type Gamma = [(Int, Type)]
 type Psi = [(String, Type)]
-data Type = TInt |TCode {getGamma :: Gamma} | TVar String | TForall String Type deriving (Show, Eq)
+data Type = TInt |TCode {getGamma :: Gamma} | TVar String | TForall String Type deriving (Show, Eq, Ord)
 
 data InstructionSequence = Seq {getName :: String, getCode :: [Instruction], getJump :: Value, getRegisters :: [Int] } deriving (Show, Eq)
 type Program = [InstructionSequence]
