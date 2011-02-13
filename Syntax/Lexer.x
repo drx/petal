@@ -23,11 +23,15 @@ tokens :-
         salloc                          { \p s -> tokenWithPos p TkSalloc }
 	sp				{ \p s -> tokenWithPos p (TkRegister 0) }
         sfree                           { \p s -> tokenWithPos p TkSfree }
+        ptr                           { \p s -> tokenWithPos p TkTPtr }
+        uptr                           { \p s -> tokenWithPos p TkTUPtr }
         "["                             { \p s -> tokenWithPos p TkLBracket }
         "]"                             { \p s -> tokenWithPos p TkRBracket }
         "+"                             { \p s -> tokenWithPos p TkPlus }
         "="                             { \p s -> tokenWithPos p TkAssign }
         ":"                             { \p s -> tokenWithPos p TkColon }
+        "("                             { \p s -> tokenWithPos p TkLParen }
+        ")"                             { \p s -> tokenWithPos p TkRParen }
         "{"                             { \p s -> tokenWithPos p TkLCBrace }
         "}"                             { \p s -> tokenWithPos p TkRCBrace }
         ","                             { \p s -> tokenWithPos p TkComma }
@@ -55,6 +59,10 @@ data BaseToken =
         | TkCommit
         | TkSalloc
         | TkSfree
+        | TkTPtr
+        | TkTUPtr
+        | TkLParen
+        | TkRParen
         | TkLBracket
         | TkRBracket
         | TkRegister Int

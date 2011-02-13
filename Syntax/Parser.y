@@ -31,11 +31,15 @@ import Data.List
         Plus            { (_,TkPlus)    }
         LCBrace         { (_,TkLCBrace)    }
         RCBrace         { (_,TkRCBrace)    }
+        LParen         { (_,TkLParen)    }
+        RParen         { (_,TkRParen)    }
         Dot             { (_,TkDot)    }
         Comma           { (_,TkComma)    }
         Lambda          { (_,TkLambda)    }
         TInt            { (_,TkTInt)    }
         TCode           { (_,TkTCode)    }
+        TPtr           { (_,TkTPtr)    }
+        TUPtr           { (_,TkTUPtr)    }
 
 %left Delimiter
 %left If Jump
@@ -66,7 +70,12 @@ type :: { Type }
 type: TInt { TInt }
       | TCode gamma { TCode $2 }
       | Lambda Name Dot type { TForall $2 $4 }
+      | TPtr LParen atype RParen { TPtr $3 }
+      | TUPtr LParen atype RParen { TUPtr $3 }
       | Name { TVar $1 }
+
+atype: type { ATValue $1 }
+        | type Comma atype { ATAdjacent (ATValue $1) $3 }
 
 gamma :: { Gamma }
 gamma: 		LCBrace registertypes RCBrace { $2 }

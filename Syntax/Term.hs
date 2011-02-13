@@ -61,7 +61,11 @@ data Type =   TInt
             | TCode {getGamma :: Gamma} 
             | TVar String 
             | TForall String Type 
+            | TPtr AType
+            | TUPtr AType
             deriving (Eq, Ord)
+
+data AType = ATEmpty | ATValue Type | ATAdjacent AType AType | ATVar String deriving (Eq, Ord, Show)
 
 instance Show Type where
     show TInt = "int"

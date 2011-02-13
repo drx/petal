@@ -78,12 +78,20 @@ tiv psi v = case v of
 tiop :: Psi -> Gamma -> Value -> Type
 tiop psi gamma v = case v of
     Register r -> gammaLookup gamma r
-            
+    UPointer h -> TUPtr $ tihv psi gamma h
     _ -> tiv psi v
+
+tihv :: Psi -> Gamma -> HeapValue -> AType
+tihv psi gamma (Tup vs) = foldr1 ATAdjacent $ map (ATValue . (tiop psi gamma)) vs
 
 tii :: Psi -> Instruction -> Gamma -> Gamma
 tii psi ins gamma = case ins of
-    Assign d v -> gammasubst gamma d (tiop psi gamma v)
+    Assign d v ->
+        case tau of
+            TUPtr _ -> error $ "Illegal unique pointer assignment: " ++ show ins
+            _ -> gammasubst gamma d tau
+        where
+            tau = tiop psi gamma v
     AssignPlus d s v | (tcop psi gamma (Register s) TInt) && (tcop psi gamma v TInt) -> gammasubst gamma d TInt
     IfJump s v ->
         if (tcop psi gamma (Register s) TInt) then
@@ -93,3 +101,47 @@ tii psi ins gamma = case ins of
                 error $ "Type mismatch in jump: " ++ show ins
         else
             error $ "If operand not an int: " ++ show ins
+
+    Malloc d n -> if n >= 0 then gammasubst gamma d $ TUPtr $ foldr1 ATAdjacent $ replicate n $ ATValue TInt
+        else error $ "Cannot malloc negative n: " ++ show ins
+        
+    Commit d -> if d /= 0 then
+        case tiop psi gamma (Register d) of
+            TUPtr s -> gammasubst gamma d (TPtr s)
+            _ -> error $ "Register not a unique pointer: " ++ show ins
+        else error $ "Cannot commit stack pointer: " ++ show ins
+
+    Load d s n -> case tiop psi gamma (Register s) of
+        TPtr sig -> gammasubst gamma d $ adjindex sig n
+        TUPtr sig -> gammasubst gamma d $ adjindex sig n
+
+    Save d s n -> case tiop psi gamma (Register d) of
+        TPtr sig -> case taun of
+            TUPtr _ -> error $ "Illegal unique pointer assignment: " ++ show ins
+            _ -> if tcop psi gamma (Register s) taun then gamma
+                else error $ "Illegal register type: " ++ show ins
+            where
+                taun = adjindex sig n
+        TUPtr sig -> case tau of
+            TUPtr _ -> error $ "Illegal unique pointer assignment: " ++ show ins
+            _ -> gammasubst gamma d (TUPtr $ adjupdate sig n tau)
+            where
+                tau = tiop psi gamma (Register s)
+
+    Salloc n -> if n >= 0 then case tiop psi gamma (Register 0) of 
+            TUPtr sig -> gammasubst gamma 0 $ TUPtr $ foldr ATAdjacent sig (replicate n $ ATValue TInt)
+            _ -> error $ "Stack pointer not a unique pointer: " ++ show ins
+        else error $ "Cannot salloc negative n: " ++ show ins
+
+    Sfree n -> case tiop psi gamma (Register 0) of 
+        TUPtr sig -> gammasubst gamma 0 $ TUPtr $ adjdrop sig n
+        _ -> error $ "Stack pointer not a unique pointer: " ++ show ins
+
+adjindex (ATAdjacent (ATValue t) ts) 1 = t
+adjindex (ATAdjacent t ts) n = adjindex ts (n-1)
+
+adjupdate (ATAdjacent (ATValue _) ts) 1 tau = ATAdjacent (ATValue tau) ts
+adjupdate (ATAdjacent t ts) n tau = ATAdjacent t $ adjupdate ts (n-1) tau
+
+adjdrop (ATAdjacent _ ts) 1 = ts
+adjdrop (ATAdjacent t ts) n = adjdrop ts (n-1)
