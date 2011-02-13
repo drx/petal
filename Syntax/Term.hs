@@ -109,6 +109,13 @@ ftv (TInt) = []
 ftv (TCode g) = concat (map (ftv.snd) g)
 ftv (TVar s) = [s]
 ftv (TForall s t) = (ftv t) \\ [s]
+ftv (TPtr sig) = ftv' sig
+ftv (TUPtr sig) = ftv' sig
+
+ftv' ATEmpty = []
+ftv' (ATValue t) = ftv t
+ftv' (ATAdjacent s1 s2) = nub $ ftv' s1 ++ ftv' s2
+ftv' (ATVar v) = [v]
 
 registersv :: Value -> [Int]
 registersv (Int n) = []

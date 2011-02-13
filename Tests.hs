@@ -12,8 +12,9 @@ typecheckTest1 = "loop: code{r1: int, r2: int, r3: int}\n\
             \r1 = r1 + -1\n\
             \jump loop\n"
 
-tal1Test =  "start: r1 = mem[r2 + 5] \n\
-            \mem[r2 + 5] = r2 \n\
+tal1Test =  "start: code{r2:int}\n\
+            \r1 = mem[r2 + 5] \n\
+            \mem[r2 + 5] = r1 \n\
             \r3 = malloc 3 \n\
             \commit r4 \n\
             \salloc 6 \n\

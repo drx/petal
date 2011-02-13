@@ -114,6 +114,7 @@ tii psi ins gamma = case ins of
     Load d s n -> case tiop psi gamma (Register s) of
         TPtr sig -> gammasubst gamma d $ adjindex sig n
         TUPtr sig -> gammasubst gamma d $ adjindex sig n
+        _ -> error $ "Illegal load: " ++ show ins
 
     Save d s n -> case tiop psi gamma (Register d) of
         TPtr sig -> case taun of
