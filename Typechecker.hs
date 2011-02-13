@@ -18,7 +18,7 @@ psiLookup = lookupErr $ \l -> "Block does not exist: " ++ l
 gammaLookup :: Gamma -> Int -> Type
 gammaLookup = lookupErr $ \n -> "Register does not exist: r" ++ show n
 
-heapLookup :: Heap -> String -> InstructionSequence
+heapLookup :: Heap -> String -> HeapValue
 heapLookup = lookupErr $ \l -> "Block does not exist: " ++ l
 
 gammasubst :: Gamma -> Int -> Type -> Gamma
@@ -28,8 +28,10 @@ psify :: Program -> Psi
 psify [] = []
 psify ((Seq l _ _ _ t):is) = (l,t):psify is
 
---tc :: Program -> Bool
-tc p = all (\(l,i) -> tcm (heap, [], i) psi (getGamma (getAscription i))) heap
+rtp = tc . parse . lex
+
+tc :: Program -> Bool
+tc p = all (\(l,i) -> tcm (heap, [], getHeapSequence i) psi (getGamma (getAscription $ getHeapSequence i))) heap
     where
         (heap, _, _) = statify p
         psi = psify p
@@ -38,7 +40,7 @@ tcm :: State -> Psi -> Gamma -> Bool
 tcm (h, rf, i) psi gamma = and [tch h psi, tcr psi rf gamma, tciseq psi i (TCode gamma)]
 
 tch :: Heap -> Psi -> Bool
-tch h psi = all (\(l,t) -> tciseq psi (heapLookup h l) t && null (ftv t)) psi
+tch h psi = all (\(l,t) -> tciseq psi (getHeapSequence $ heapLookup h l) t && null (ftv t)) psi
 
 tcr :: Psi -> RegisterFile -> Gamma -> Bool
 tcr psi rf gamma = all (\(n,v) -> tcv psi v $ gammaLookup gamma n) rf

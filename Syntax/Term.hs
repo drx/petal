@@ -63,8 +63,8 @@ data Type =   TInt
             | TForall String Type 
             deriving (Show, Eq, Ord)
 
-data HeapValue =      HeapSeq InstructionSequence
-                    | Tup [Value]
+data HeapValue =      HeapSeq { getHeapSequence :: InstructionSequence }
+                    | Tup {     getTuple :: [Value] }
                     deriving (Show, Eq)
 
 data InstructionSequence = Seq {    getName :: String,
