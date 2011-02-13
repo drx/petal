@@ -116,7 +116,7 @@ tii psi ins gamma = case ins of
         TUPtr sig -> gammasubst gamma d $ adjindex sig n
         _ -> error $ "Illegal load: " ++ show ins
 
-    Save d s n -> case tiop psi gamma (Register d) of
+    Save s d n -> case tiop psi gamma (Register d) of
         TPtr sig -> case taun of
             TUPtr _ -> error $ "Illegal unique pointer assignment: " ++ show ins
             _ -> if tcop psi gamma (Register s) taun then gamma
@@ -124,10 +124,12 @@ tii psi ins gamma = case ins of
             where
                 taun = adjindex sig n
         TUPtr sig -> case tau of
-            TUPtr _ -> error $ "Illegal unique pointer assignment: " ++ show ins
+            TUPtr _ -> error $ "Illegal unique pointer assignment: " ++ show ins ++ show sig
+
             _ -> gammasubst gamma d (TUPtr $ adjupdate sig n tau)
             where
                 tau = tiop psi gamma (Register s)
+        a -> error $ show ins ++ show a
 
     Salloc n -> if n >= 0 then case tiop psi gamma (Register 0) of 
             TUPtr sig -> gammasubst gamma 0 $ TUPtr $ foldr ATAdjacent sig (replicate n $ ATValue TInt)
@@ -138,6 +140,7 @@ tii psi ins gamma = case ins of
         TUPtr sig -> gammasubst gamma 0 $ TUPtr $ adjdrop sig n
         _ -> error $ "Stack pointer not a unique pointer: " ++ show ins
 
+adjindex (ATValue t) 1 = t
 adjindex (ATAdjacent (ATValue t) ts) 1 = t
 adjindex (ATAdjacent t ts) n = adjindex ts (n-1)
 

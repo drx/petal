@@ -29,11 +29,11 @@ test Tc 1 = "loop: code{r1: code{}, r2: int, r3: int}\n\
             \r1 = r1 + -1\n\
             \jump loop\n"
 
-test In 0 =  "start: code{r2: uptr(int,int,int,int)} \n\
+test In 0 =  "start: code{r0: uptr(int), r2: uptr(int,int,int,int,int)} \n\
             \r1 = mem[r2 + 5] \n\
             \mem[r2 + 5] = r1 \n\
             \r3 = malloc 3 \n\
-            \commit r4 \n\
+            \commit r3 \n\
             \salloc 6 \n\
             \sfree 2 \n\
             \jump exit"

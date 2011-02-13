@@ -74,6 +74,8 @@ instance Show Type where
     show (TCode g) = "code{" ++ intercalate ", " (showGamma g) ++ "}" where
         showGamma ((n,t):gs) = ("r" ++ (show n) ++ ":" ++ (show t)):(showGamma gs)
         showGamma [] = []
+    show (TUPtr sig) = "uptr(" ++ show sig ++ ")"
+    show (TPtr sig) = "ptr(" ++ show sig ++ ")"
 
 data HeapValue =      HeapSeq { getHeapSequence :: InstructionSequence }
                     | Tup {     getTuple :: [Value] }
