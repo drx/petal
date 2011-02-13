@@ -16,9 +16,9 @@ rep = interpret . statify . parse . lex
 interpret :: State -> IO ()
 interpret s@(heap, rf, i) = case step s of
     Just s' -> interpret s'
-    Nothing -> putStrLn $ "Finished" ++ "\n" ++
-        "\theap: " ++ (show heap) ++ "\n" ++
-        "\tregisterfile: " ++ (show rf) ++ "\n" 
+    Nothing -> putStrLn $   "Finished successfully\n\
+                            \heap: " ++ (show heap) ++ "\n\
+                            \registerfile: " ++ (show rf) ++ "\n" 
 
 uniqueLabel :: Heap -> String
 uniqueLabel heap = head $ (labels 0)\\ (map fst heap) where
@@ -107,7 +107,7 @@ step (heap, rf, iss) = case iss of
                 Label l | l == exit -> Nothing
                 _ -> case h rf heap (rhat rf v) of
                     HeapSeq i -> Just (heap, rf, i)
-                    Tup _ -> error "Jumping to a data label"
+                    Tup _ -> error $ "Jumping to a data label" ++ (show v)
 
         n ->    Just (heap, rf, Seq s is jv rs t)
 
@@ -115,7 +115,7 @@ step (heap, rf, iss) = case iss of
         Label l | l == exit -> Nothing
         _ -> case  h rf heap (rhat rf jv) of
             HeapSeq i -> Just (heap, rf, i)
-            Tup _ -> error "Jumping to a data label"
+            Tup _ -> error $ "Jumping to a data label " ++ (show jv)
 
     
     is ->   error $ "Stuck term:\n" ++ 
