@@ -23,9 +23,8 @@ interpret :: State -> IO ()
 interpret s@(heap, rf, i) = case step s of
     Just s' -> interpret s'
     Nothing -> putStrLn $ "Finished" ++ "\n" ++
---      "\theap: " ++ (show heap) ++ "\n" ++
-        "\tregisterfile: " ++ (show rf) ++ "\n" -- ++
---      "\tinstructions: " ++ (show i) ++ "\n"
+        "\theap: " ++ (show heap) ++ "\n" ++
+        "\tregisterfile: " ++ (show rf) ++ "\n" 
 
 uniqueLabel :: Heap -> String
 uniqueLabel heap = head $ (labels 0)\\ (map fst heap) where
@@ -59,7 +58,7 @@ replace a v n = let (f,s) = splitAt n a in (init f) ++ (v:s)
 
 step :: State -> Maybe State
 step (heap, rf, iss) = case iss of
-    Seq s ((Assign r1 v):is) jv rs -> case rhat rf (Register r1) of
+    Seq s ((Assign r1 v):is) jv rs -> case rhat rf v of
         UPointer h  -> error $ "Illegal unique pointer access"
         _           -> Just (heap, substreg rf r1 v, Seq s is jv rs)
     
@@ -73,22 +72,23 @@ step (heap, rf, iss) = case iss of
     Seq s ((Load r1 r2 n):is) jv rs -> case r rf r2 of
         UPointer h -> case h of
             HeapSeq _ -> error "Loading data from code label"
-            Tup t -> Just (heap, substreg rf r1 (t !! n), Seq s is jv rs)
+            Tup t -> Just (heap, substreg rf r1 (t !! (n - 1)), Seq s is jv rs)
         Label l -> case  h rf heap (Label l) of
             HeapSeq _ -> error "Loading data from codo label"
-            Tup t -> Just (heap, substreg rf r1 (t !! n), Seq s is jv rs)
+            Tup t -> Just (heap, substreg rf r1 (t !! (n - 1)), Seq s is jv rs)
 
     Seq s ((Save r1 r2 n):is) jv rs -> case r rf r2 of
         UPointer h -> case h of
             HeapSeq _ -> error "Saving data under code label"
             Tup t -> case (r rf r1) of
                 UPointer _ -> error "Saving data under unique pointer"
-                v -> Just (heap, substreg rf r1 (UPointer (Tup (replace t v n))), Seq s is jv rs)
+                v -> Just (heap, substreg rf r2 (UPointer (Tup (replace t v n))), Seq s is jv rs)
         Label l -> case  h rf heap (Label l) of
             HeapSeq _ -> error "Saving data under codo label"
             Tup t ->  case (r rf r1) of
                 UPointer _ -> error "Saving data under unique pointer"
                 v -> Just (substheap heap l (Tup t), rf, Seq s is jv rs)
+        v -> error $ "Some error " ++ (show v)
 
     Seq s ((Salloc n):is) jv rs -> case r rf 0 of
         UPointer h -> case h of
