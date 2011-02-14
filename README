@@ -1,2 +1,1 @@
-todo:
-add special case for typechecking to the exit label
+cabal install ansi-terminal
