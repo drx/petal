@@ -27,23 +27,32 @@ isPassable :: Test -> Bool
 isPassable (Passable _) = True
 isPassable (Unpassable _) = False
 
-runTcTests :: IO()
-runTests fun tp nm rng = mapM_ (\x -> do
+runTcTests :: IO ()
+runTests fun tp nm rng = mapM_ (\ x -> do
     cyanColor
     putStrLn (nm ++ " Test #" ++ show x)
     resetColor
-    catch (do 
-        fun (getString $ test tp x) 
+    catch (do
+        fun (getString $ test tp x)
         if isPassable (test tp x)
             then greenColor >> putStrLn "Pass"
             else redColor >> putStrLn "Fail - should have failed, but passed"
-        resetColor) ((\ex -> do if isPassable (test tp x) 
-                                    then redColor >> (putStrLn $ "\nFail") >> yellowColor >> putStrLn ("Exception caught: " ++ (show ex))
-                                    else greenColor >> (putStrLn $ "\nPass - Controlled failure") >> yellowColor >> (putStrLn $ "Exception caught: " ++ (show ex))
+        resetColor) ((\ ex -> do
+                                if isPassable (test tp x)
+                                    then do
+                                        redColor
+                                        putStrLn "\nFail"
+                                        yellowColor
+                                        putStrLn $ "Exception caught: " ++ (show ex)
+                                    else do
+                                        greenColor
+                                        putStrLn "\nPass - Controlled failure"
+                                        yellowColor
+                                        putStrLn $ "Exception caught: " ++ (show ex)
                                 resetColor) :: SomeException -> IO ())) rng
 
-runInTests = runTests rep In "Interpreter" [0..12]
-runTcTests = runTests retp Tc "Typechecker" [0..14]
+runInTests = runTests rep In "Interpreter" [0 .. 12]
+runTcTests = runTests retp Tc "Typechecker" [0 .. 14]
 
 test Tc 0 = Passable "start: code{r0: uptr(), r2: uptr(int,int,int,int,int)} \n\
             \r1 = mem[r2 + 5] \n\
@@ -119,36 +128,36 @@ test Tc 8 = Passable "start: code{r1:int}\n\
         \r1 = 4 \n\
         \jump exit\n"
 
-test Tc 9 = Passable "start: code{r0: int, r1:int, r12:int, r33:int}\n\ 
+test Tc 9 = Passable "start: code{r0: int, r1:int, r12:int, r33:int}\n\
         \r1 = 4\n\n\
-        \r0 = 1\n\ 
+        \r0 = 1\n\
         \jump s2\n\
 
         \trololol: code{r0:int, r1:int, r12:int, r33:int}\n\
         \r33 = r1 + 1\n\
-        \ jump exit\n\ 
+        \ jump exit\n\
 
         \s2: code{r0:int, r1:int, r12:int, r33:int}\n\
-        \if r0 jump trololol\n\ 
+        \if r0 jump trololol\n\
         \r12 = 4\n\
         \jump exit;comment trololol\n"
 
-test Tc 10 = Unpassable "start: code{r0: int, r1:int, r12:int, r33:int}\n\ 
+test Tc 10 = Unpassable "start: code{r0: int, r1:int, r12:int, r33:int}\n\
         \r1 = 4\n\n\
-        \r0 = 1\n\ 
+        \r0 = 1\n\
         \jump s2\n\
 
         \trololol: code{r0:int, r1:code{}, r12:int, r33:int}\n\
         \r33 = r1 + 1\n\
-        \ jump exit\n\ 
+        \ jump exit\n\
 
         \s2: code{r0:int, r1:int, r12:int, r33:int}\n\
-        \if r0 jump trololol\n\ 
+        \if r0 jump trololol\n\
         \r12 = 4\n\
         \jump exit;comment trololol\n"
 
 test Tc 11 = Passable "prod: code{r1:int, r2:int, r3:int} \n\
-            \r3 = 0; res = 0\n\ 
+            \r3 = 0; res = 0\n\
             \r1 = 5\n\
             \r2 = 7\n\
             \jump loop\n\n\
@@ -255,36 +264,36 @@ test In 8 = Passable "start: code{r1:int}\n\
         \r1 = 4 \n\
         \jump exit\n"
 
-test In 9 = Passable "start: code{r0: int, r1:int, r12:int, r33:int}\n\ 
+test In 9 = Passable "start: code{r0: int, r1:int, r12:int, r33:int}\n\
         \r1 = 4\n\n\
-        \r0 = 1\n\ 
+        \r0 = 1\n\
         \jump s2\n\
 
         \trololol: code{r0:int, r1:int, r12:int, r33:int}\n\
         \r33 = r1 + 1\n\
-        \ jump exit\n\ 
+        \ jump exit\n\
 
         \s2: code{r0:int, r1:int, r12:int, r33:int}\n\
-        \if r0 jump trololol\n\ 
+        \if r0 jump trololol\n\
         \r12 = 4\n\
         \jump exit;comment trololol\n"
 
-test In 10 = Passable "start: code{r0: int, r1:int, r12:int, r33:int}\n\ 
+test In 10 = Passable "start: code{r0: int, r1:int, r12:int, r33:int}\n\
         \r1 = 4\n\n\
-        \r0 = 1\n\ 
+        \r0 = 1\n\
         \jump s2\n\
 
         \trololol: code{r0:int, r1:code{}, r12:int, r33:int}\n\
         \r33 = r1 + 1\n\
-        \ jump exit\n\ 
+        \ jump exit\n\
 
         \s2: code{r0:int, r1:int, r12:int, r33:int}\n\
-        \if r0 jump trololol\n\ 
+        \if r0 jump trololol\n\
         \r12 = 4\n\
         \jump exit;comment trololol\n"
 
 test In 11 = Passable "prod: code{r1:int, r2:int, r3:int} \n\
-            \r3 = 0; res = 0\n\ 
+            \r3 = 0; res = 0\n\
             \r1 = 5\n\
             \r2 = 7\n\
             \jump loop\n\n\
